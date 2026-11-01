@@ -1,0 +1,247 @@
+/* ==========================================================================
+   Lead Finder: styles
+   Class names are unchanged, so your existing HTML keeps working.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design tokens (light theme)
+   -------------------------------------------------------------------------- */
+:root {
+  --bg: #f8fafc;        /* page background */
+  --card: #ffffff;      /* cards, table surface */
+  --fg: #0f172a;        /* main text */
+  --muted: #64748b;     /* secondary text */
+  --border: #e2e8f0;    /* borders and dividers */
+
+  --accent: #3b4bdb;    /* primary buttons, focus ring */
+  --accent-fg: #ffffff; /* text on accent */
+
+  --ok: #128c4a;        /* success / WhatsApp */
+  --ok-bg: #dcf8e6;
+  --bad: #b42318;       /* error / has chatbot */
+  --bad-bg: #fde4e1;
+  --warn: #92580a;      /* opportunity / no chatbot */
+  --warn-bg: #fdefd3;
+  --muted-bg: #e8ecf3;
+
+  --radius: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Dark theme (follows the user's system setting)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --card: #131c2e;
+    --fg: #e8edf7;
+    --muted: #94a3b8;
+    --border: #243049;
+
+    --accent: #7b88ff;
+    --accent-fg: #0b1020;
+
+    --ok: #4ade80;
+    --ok-bg: #12351f;
+    --bad: #f87171;
+    --bad-bg: #3b1512;
+    --warn: #fbbf24;
+    --warn-bg: #3a2a0a;
+    --muted-bg: #232b3b;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Base
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Centered page container */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+/* --------------------------------------------------------------------------
+   4. Form controls (inputs, dropdowns, buttons)
+   -------------------------------------------------------------------------- */
+
+/* Search form and filter bar share the same wrapping row layout */
+.form,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Text inputs and dropdowns */
+input,
+select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  margin :5px;
+}
+
+select {
+  cursor: pointer;
+}
+
+/* Checkboxes keep their native size */
+input[type="checkbox"] {
+  padding: 0;
+  accent-color: var(--accent);
+}
+
+/* Primary button */
+button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-fg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Secondary button (outlined) */
+button.secondary {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+/* Visible keyboard focus for every control */
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   5. Results table
+   -------------------------------------------------------------------------- */
+
+/* Card around the table; scrolls sideways on small screens */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* No divider under the last row */
+tr:last-child td {
+  border-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   6. Text helpers
+   -------------------------------------------------------------------------- */
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--bad);
+}
+
+/* --------------------------------------------------------------------------
+   7. Status badges
+   Always pair color with a text label (for example "✓ Yes") so the
+   meaning doesn't depend on color alone.
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--muted-bg);
+  color: var(--muted);
+}
+
+/* Positive: uses WhatsApp */
+.badge-yes {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+/* Negative: has a chatbot already */
+.badge-no {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+/* Neutral / unknown */
+.badge-muted {
+  background: var(--muted-bg);
+  color: var(--muted);
+}
+
+/* Opportunity: no chatbot (new class, optional) */
+.badge-warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* --------------------------------------------------------------------------
+   8. Small screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* Stack form fields full width */
+  .form > *,
+  .filters > input,
+  .filters > select {
+    width: 100%;
+  }
+}
