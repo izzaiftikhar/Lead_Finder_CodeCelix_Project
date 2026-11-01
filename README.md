@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeCelix Lead Finder (v2)
 
-## Getting Started
+Next.js frontend (Vercel) + FastAPI backend (EthioDeploy). The browser only talks to Next.js `/api/*`; that route proxies to
+FastAPI with `BACKEND_API_URL` / `BACKEND_API_KEY` and keeps the session token in an httpOnly cookie.
 
-First, run the development server:
+## What it does (per the build spec)
+Pick country → niche (allowed combos enforced by the server from the `country_niches` table) → cities (search, state filter, select all) →
+lead count 10–200 → filters → Start. A background job discovers businesses, inspects websites (up to 5 pages), keeps only businesses with a
+WhatsApp number, and loops until N leads are found or candidates/budget run out (then PARTIAL with a shortfall breakdown).
+Results: confidence, evidence drawer, feedback buttons, save, CSV/XLSX export (formula-injection safe), job history, re-run, cancel, resume.
+Accounts (email+password, PBKDF2, hashed session tokens), roles admin/user, per-user data isolation, daily lead quota, admin panel
+(matrix, keywords, chatbot signatures, limits, suppression list, cost).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Detection rules (deterministic, no LLM)
+WhatsApp: CONFIRMED = wa.me / api.whatsapp.com link, floating-button plugin config, or "WhatsApp" within 60 chars of a number, found on the
+business's own pages. PROBABLE = valid mobile from discovery with no WhatsApp mention (only when "confirmed only" is off).
+Type: AUTOMATED if a WhatsApp-automation vendor/bot text is found, else MANUAL ("no bot signal found", not a live test).
+Chatbot: YES (vendor signature or generic widget), NO only when the site was fetched fully, UNKNOWN when blocked/timeout/no site.
+Hot lead = CONFIRMED + MANUAL + chatbot NO.
+Known limit: inspection is static HTTP only (no Playwright), so widgets injected purely by JavaScript can be missed; confidence is lowered accordingly.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Run locally
+    python -m venv .venv && .venv\Scripts\activate && python -m pip install -r requirements-dev.txt
+    python -m uvicorn app:app --reload          # http://127.0.0.1:8000
+    npm install && npm run dev                  # needs BACKEND_API_URL=http://127.0.0.1:8000 in .env
+Tests: `python -m unittest backend.tests.test_core backend.tests.test_api`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+Backend (EthioDeploy): build `pip install -r requirements.txt`, start `uvicorn app:app --host 0.0.0.0 --port $PORT`.
+Set `DATABASE_URL` (PostgreSQL) for persistence. Frontend (Vercel): `npm install && npm run build`. Variables: see `.env.example`.
+Full city list: `python scripts/load_geonames.py cities15000.txt` (GeoNames, CC-BY 4.0 attribution required).
