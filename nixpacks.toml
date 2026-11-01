@@ -1,7 +1,13 @@
 ﻿providers = ["python"]
 
 [phases.setup]
-nixPkgs = ["python313Packages.pip"]
+nixPkgs = ["...", "uv"]
+
+[phases.install]
+cmds = [
+  "uv venv /opt/venv --python python",
+  "uv pip install --python /opt/venv/bin/python -r requirements.txt"
+]
 
 [start]
-cmd = "python -m uvicorn app:app --host 0.0.0.0 --port $PORT"
+cmd = "/opt/venv/bin/python -m uvicorn app:app --host 0.0.0.0 --port $PORT"
